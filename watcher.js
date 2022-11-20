@@ -10,17 +10,17 @@ let previousHash
  * Clear the console, execute the file and show the result.
  */
 const executeFile = path => {
-	console.log('\x1Bc') // clear console
+  console.log('\x1Bc') // clear console
 
-	exec(`node ${path}`, (error, stdout, stderr) => {
-		if (error) {
-			console.error(error)
-			return
-		}
+  exec(`node ${path}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(error)
+      return
+    }
 
-		console.log(stdout)
-  	if (stderr !== "") console.log(stderr)
-	})
+    console.log(stdout)
+    if (stderr !== "") console.log(stderr)
+  })
 }
 
 /*
@@ -28,12 +28,12 @@ const executeFile = path => {
  * This hasher is made to handle big files.
  */
 const checksum = path => new Promise((resolve, reject) => {
-	const hash = crypto.createHash('md5')
-	const stream = fs.createReadStream(path)
+  const hash = crypto.createHash('md5')
+  const stream = fs.createReadStream(path)
 
-	stream.on('error', reject)
-	stream.on('data', data => hash.update(data, 'utf8'))
-	stream.on('end', () => resolve(hash.digest('hex')))
+  stream.on('error', reject)
+  stream.on('data', data => hash.update(data, 'utf8'))
+  stream.on('end', () => resolve(hash.digest('hex')))
 })
 
 /* 
@@ -42,14 +42,14 @@ const checksum = path => new Promise((resolve, reject) => {
  * It also avoid 'fs.watch' to fire the 'executeFile' function twice.
  */
 fs.watch(filename).on('change', async () => {
-	await checksum(filename)
-		.then(hash => {
-			if (hash === previousHash) return
-			previousHash = hash
+  await checksum(filename)
+    .then(hash => {
+      if (hash === previousHash) return
+      previousHash = hash
 
-			executeFile(filename)
-		})
-		.catch(error => console.log(error))
+      executeFile(filename)
+    })
+    .catch(error => console.log(error))
 })
 
 executeFile(filename) // first file exec
